@@ -5,7 +5,7 @@ import sys
 
 
 def load_cascades():
-    """Load Haar cascade classifiers for face and smile detection."""
+    
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
     smile_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_smile.xml")
 
@@ -17,13 +17,7 @@ def load_cascades():
 
 
 def detect_smile_in_frame(frame, face_cascade, smile_cascade):
-    """
-    Detect faces and smiles in a single frame.
-
-    Returns:
-        annotated frame with bounding boxes drawn
-        list of (face_rect, smiling: bool) tuples
-    """
+   
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray = cv2.equalizeHist(gray)  # Improve contrast for better detection
 
@@ -37,7 +31,7 @@ def detect_smile_in_frame(frame, face_cascade, smile_cascade):
     results = []
 
     for (x, y, w, h) in faces:
-        # Region of interest — focus smile detection on the lower half of the face
+       
         roi_gray  = gray[y + h // 2 : y + h, x : x + w]
         roi_color = frame[y + h // 2 : y + h, x : x + w]
 
@@ -51,11 +45,11 @@ def detect_smile_in_frame(frame, face_cascade, smile_cascade):
         is_smiling = len(smiles) > 0
         results.append(((x, y, w, h), is_smiling))
 
-        # Draw face rectangle
+       
         face_color = (0, 255, 0) if is_smiling else (255, 100, 50)
         cv2.rectangle(frame, (x, y), (x + w, y + h), face_color, 2)
 
-        # Label above the face box
+        
         label = "😊 Smiling!" if is_smiling else "😐 No Smile"
         cv2.putText(
             frame, label,
@@ -64,7 +58,7 @@ def detect_smile_in_frame(frame, face_cascade, smile_cascade):
             face_color, 2,
         )
 
-        # Draw smile rectangles (offset to full frame coordinates)
+      
         for (sx, sy, sw, sh) in smiles:
             cv2.rectangle(
                 roi_color,
@@ -76,7 +70,7 @@ def detect_smile_in_frame(frame, face_cascade, smile_cascade):
 
 
 def run_webcam(save_path=None):
-    """Run real-time smile detection from the default webcam."""
+   
     face_cascade, smile_cascade = load_cascades()
 
     cap = cv2.VideoCapture(0)
@@ -103,7 +97,7 @@ def run_webcam(save_path=None):
 
         frame, results = detect_smile_in_frame(frame, face_cascade, smile_cascade)
 
-        # HUD overlay
+      
         face_count    = len(results)
         smiling_count = sum(1 for _, s in results if s)
         hud = f"Faces: {face_count}  |  Smiling: {smiling_count}"
@@ -124,7 +118,7 @@ def run_webcam(save_path=None):
 
 
 def run_image(image_path):
-    """Run smile detection on a static image and display the result."""
+   
     face_cascade, smile_cascade = load_cascades()
 
     frame = cv2.imread(image_path)
@@ -139,7 +133,7 @@ def run_image(image_path):
         status = "Smiling 😊" if smiling else "Not smiling 😐"
         print(f"  Face {i}: {status}  |  bounding box: {rect}")
 
-    # Save annotated image next to the original
+    
     out_path = image_path.rsplit(".", 1)[0] + "_detected.jpg"
     cv2.imwrite(out_path, frame)
     print(f"\n[INFO] Annotated image saved to: {out_path}")
